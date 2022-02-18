@@ -43,6 +43,7 @@ public class JoystickDrive extends CommandBase {
   public void initialize() {
     m_driveTrain.resetGyro();
     // m_driveTrain.resetEncoder(); Do this eventually please
+    //I hate science fair
   }
 
   // Called every time the scheduler runs while the command is scheduled.
