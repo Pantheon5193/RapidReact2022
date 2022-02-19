@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /** An example command that uses an example subsystem. */
 public class JoystickShooter extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Shooter m_subsystem;
+  private final Shooter m_shooter;
   private XboxController controller;
 
   /**
@@ -22,7 +22,7 @@ public class JoystickShooter extends CommandBase {
    * @param subsystem The subsystem used by this command.
    */
   public JoystickShooter(Shooter subsystem, XboxController gamepad) {
-    m_subsystem = subsystem;
+    m_shooter = subsystem;
     controller = gamepad;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
@@ -35,18 +35,18 @@ public class JoystickShooter extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.setPowerShooter(() -> controller.getLeftTriggerAxis());
+    m_shooter.setPowerShooter(() -> controller.getLeftTriggerAxis());
 
     if(controller.getAButton()){
-      m_subsystem.setPowerIntake(() -> 1);
+      m_shooter.setPowerIntake(() -> 1);
     }else{
-      m_subsystem.setPowerIntake(() -> 0);
+      m_shooter.setPowerIntake(() -> 0);
     }
 
     if(controller.getBButton()){
-      m_subsystem.setPowerIndex(() -> 1);
+      m_shooter.setPowerIndex(() -> 1);
     }else{
-      m_subsystem.setPowerIndex(() -> 0);
+      m_shooter.setPowerIndex(() -> 0);
     }
   }
 

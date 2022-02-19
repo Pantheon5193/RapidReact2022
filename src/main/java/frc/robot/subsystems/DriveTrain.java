@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,10 +24,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
   public void setPower(double leftP, double rightP){
-    fl.set(ControlMode.PercentOutput, leftP);
+    fl.set(ControlMode.PercentOutput, -leftP);
     fr.set(ControlMode.PercentOutput, rightP);
-    bl.set(ControlMode.PercentOutput, leftP);
+    bl.set(ControlMode.PercentOutput, -leftP);
     br.set(ControlMode.PercentOutput, rightP);
+  }
+
+  public void coastMode(){
+    fl.setNeutralMode(NeutralMode.Coast);
+    fr.setNeutralMode(NeutralMode.Coast);
+    bl.setNeutralMode(NeutralMode.Coast);
+    br.setNeutralMode(NeutralMode.Coast);
   }
 
   public double getAngle(){

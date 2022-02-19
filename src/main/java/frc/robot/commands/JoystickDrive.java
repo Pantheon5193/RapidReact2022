@@ -22,6 +22,7 @@ public class JoystickDrive extends CommandBase {
   private DoubleSupplier rightP;
   private boolean driveStraightToggle = false;
   private double targetAngle;
+  private double averagePow;
 
 
   /**
@@ -42,6 +43,7 @@ public class JoystickDrive extends CommandBase {
   @Override
   public void initialize() {
     m_driveTrain.resetGyro();
+    m_driveTrain.coastMode();
     // m_driveTrain.resetEncoder(); Do this eventually please
     //I hate science fair
   }
@@ -49,8 +51,9 @@ public class JoystickDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    averagePow= (Math.pow(leftP.getAsDouble(), 3)+Math.pow(rightP.getAsDouble(), 3))/2;
     if (((Math.abs(leftP.getAsDouble()) > .5) && (Math.abs(rightP.getAsDouble()) > .5)) && !driveStraightToggle &&
-        ((Math.round(leftP.getAsDouble()) + Math.round(rightP.getAsDouble()) == 0))) { // This long if statement checks
+        ((Math.abs(Math.round(leftP.getAsDouble()) + Math.round(rightP.getAsDouble())) == 2))) { // This long if statement checks
                                                                                        // if the sticks are pressed and
                                                                                        // sets the angle to
                                                                                        // automatically adjust to
@@ -59,13 +62,13 @@ public class JoystickDrive extends CommandBase {
     } else if ((Math.abs(leftP.getAsDouble()) < .5) || (Math.abs(rightP.getAsDouble()) < .5)) {// If sticks are let go
       driveStraightToggle = false;
     }
-    if ((driveStraightToggle) && (leftP.getAsDouble() > 0)) {// Now this is auto correct with driving forward
-      m_driveTrain.setPower((leftP.getAsDouble() + ((targetAngle - m_driveTrain.getAngle()) / 90)),
-          rightP.getAsDouble() + ((targetAngle - m_driveTrain.getAngle()) / 90));
+    if ((driveStraightToggle) && (leftP.getAsDouble() > 0)) {// Now this is auto correct with driving backward
+      m_driveTrain.setPower(averagePow - ((targetAngle - m_driveTrain.getAngle()) / 90),
+          averagePow - ((targetAngle - m_driveTrain.getAngle()) / 90));
 
-    } else if ((driveStraightToggle) && (leftP.getAsDouble() < 0)) {// Now this is auto correct with driving backward
-      m_driveTrain.setPower((leftP.getAsDouble() / 2 + ((targetAngle - m_driveTrain.getAngle()) / 90)),
-          (rightP.getAsDouble() / 2) + ((targetAngle - m_driveTrain.getAngle()) / 90));
+    } else if ((driveStraightToggle) && (leftP.getAsDouble() < 0)) {// Now this is auto correct with driving forward
+      m_driveTrain.setPower(averagePow + ((targetAngle - m_driveTrain.getAngle()) / 90),
+          (averagePow + ((targetAngle - m_driveTrain.getAngle()) / 90)));
     } else if (((Math.abs(leftP.getAsDouble()) > .2) || (Math.abs((rightP.getAsDouble())) > .2))
         && !driveStraightToggle) { // Cubed control if none of the above conditions apply but the sticks are
                                    // pressed above a threshold
@@ -77,7 +80,9 @@ public class JoystickDrive extends CommandBase {
     SmartDashboard.putNumber("Left Power", leftP.getAsDouble());
     SmartDashboard.putNumber("Right Power", rightP.getAsDouble());
     SmartDashboard.putNumber("Gyro", m_driveTrain.getAngle());
-    SmartDashboard.putBoolean("Drive Straight", driveStraightToggle);
+    SmartDashboard.putBoolean("Drive Toggle", driveStraightToggle);
+    SmartDashboard.putNumber("TargetAngle", targetAngle);
+    
 
     
   }

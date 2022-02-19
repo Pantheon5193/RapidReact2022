@@ -21,8 +21,8 @@ public class Shooter extends SubsystemBase {
   private VictorSPX index = new VictorSPX(8);
 
   public void setPowerShooter(DoubleSupplier power){
-    leftShooter.set(ControlMode.PercentOutput, -power.getAsDouble());
-    rightShooter.set(ControlMode.PercentOutput, power.getAsDouble());
+    leftShooter.set(ControlMode.PercentOutput, power.getAsDouble());
+    //rightShooter.set(ControlMode.PercentOutput, -power.getAsDouble());
   }
 
   public void setPowerIntake(DoubleSupplier power){
