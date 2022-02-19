@@ -8,6 +8,7 @@ import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** An example command that uses an example subsystem. */
@@ -15,6 +16,7 @@ public class JoystickShooter extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Shooter m_shooter;
   private XboxController controller;
+  private boolean touchytouch = false;
 
   /**
    * Creates a new ExampleCommand.
@@ -35,7 +37,12 @@ public class JoystickShooter extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.setPowerShooter(() -> controller.getLeftTriggerAxis());
+    if(controller.getLeftTriggerAxis()>.5){
+      m_shooter.setPowerShooter(() -> .85);
+    }else{
+      m_shooter.setPowerShooter(() ->0);
+    }
+    
 
     if(controller.getAButton()){
       m_shooter.setPowerIntake(() -> 1);
@@ -44,10 +51,16 @@ public class JoystickShooter extends CommandBase {
     }
 
     if(controller.getBButton()){
-      m_shooter.setPowerIndex(() -> 1);
+      m_shooter.setPowerIndex(() ->.4);
+    }else if(m_shooter.getDistance()>125){
+      m_shooter.setPowerIndex(() -> .4);
     }else{
       m_shooter.setPowerIndex(() -> 0);
     }
+
+    touchytouch = m_shooter.touch();
+    SmartDashboard.putNumber("Distance Sensor", m_shooter.getDistance());
+    SmartDashboard.putBoolean("TopLeftTouch", touchytouch);
   }
 
   // Called once the command ends or is interrupted.
