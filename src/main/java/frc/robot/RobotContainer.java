@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.JoystickClimber;
 import frc.robot.commands.JoystickDrive;
 import frc.robot.commands.JoystickShooter;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
@@ -27,15 +29,19 @@ public class RobotContainer {
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   private final DriveTrain driveTrain = new DriveTrain();
   private final Shooter shooter = new Shooter();
+  private final Climber climber = new Climber();
   private final JoystickShooter joystickShooter = new JoystickShooter(shooter,controller);
   private final JoystickDrive joystickDrive = new JoystickDrive(driveTrain, controller);
+  private final JoystickClimber joystickClimber = new JoystickClimber(climber, controller);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    driveTrain.setDefaultCommand(joystickDrive);
-    shooter.setDefaultCommand(joystickShooter);
+    //driveTrain.setDefaultCommand(joystickDrive);
+    //shooter.setDefaultCommand(joystickShooter);
+    climber.setDefaultCommand(joystickClimber);
+
   }
 
   /**

@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
@@ -12,19 +13,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** An example command that uses an example subsystem. */
-public class JoystickShooter extends CommandBase {
+public class JoystickClimber extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Shooter m_shooter;
+  private final Climber m_Climber;
   private XboxController controller;
-  private boolean touchytouch = false;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public JoystickShooter(Shooter subsystem, XboxController gamepad) {
-    m_shooter = subsystem;
+  public JoystickClimber(Climber subsystem, XboxController gamepad) {
+    m_Climber = subsystem;
     controller = gamepad;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
@@ -32,35 +32,28 @@ public class JoystickShooter extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+      m_Climber.setNeutralMode();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(controller.getLeftTriggerAxis()>.5){
-      m_shooter.setPowerShooter(() -> .85);
-    }else{
-      m_shooter.setPowerShooter(() ->0);
-    }
+      if (Math.abs(controller.getRightY()) > .2) {
+          m_Climber.setPowerRightWinch(controller.getRightY());
+      } else {
+          m_Climber.setPowerRightWinch(0);
+      }
+
+      if (Math.abs(controller.getLeftY()) > .2) {
+          m_Climber.setPowerLeftWinch(controller.getLeftY());
+      } else {
+          m_Climber.setPowerLeftWinch(0);
+      }
+
+    SmartDashboard.putNumber("Left Encoder: ", m_Climber.getLeftEncoder());
+    SmartDashboard.putNumber("Right Encoder: ", m_Climber.getRightEncoder());
     
-
-    if(controller.getAButton()){
-      m_shooter.setPowerIntake(() -> 1);
-    }else{
-      m_shooter.setPowerIntake(() -> 0);
-    }
-
-    if(controller.getBButton()){
-      m_shooter.setPowerIndex(() ->-.3);
-    }else if(m_shooter.getDistance()>125){
-      m_shooter.setPowerIndex(() -> -.3);
-    }else{
-      m_shooter.setPowerIndex(() -> 0);
-    }
-
-    touchytouch = m_shooter.touch();
-    SmartDashboard.putNumber("Distance Sensor", m_shooter.getDistance());
-    SmartDashboard.putBoolean("TopLeftTouch", touchytouch);
   }
 
   // Called once the command ends or is interrupted.
