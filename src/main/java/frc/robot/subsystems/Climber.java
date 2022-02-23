@@ -2,16 +2,20 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase{
     public Climber(){}
     private TalonFX leftWinch = new TalonFX(9);
     private TalonFX rightWinch = new TalonFX(10);
+    private CANSparkMax leftReacher = new CANSparkMax(11,MotorType.kBrushless);
+    private CANSparkMax rightReacher = new CANSparkMax(12,MotorType.kBrushless);
+    private DigitalInput bottomLimit = new DigitalInput(9);
 
     public void setPowerRightWinch(double rightP){
         rightWinch.set(ControlMode.PercentOutput, rightP);
@@ -30,6 +34,14 @@ public class Climber extends SubsystemBase{
     }
     public double getRightEncoder(){
         return rightWinch.getSelectedSensorPosition();
+    }
+    public boolean getTouch(){
+        return bottomLimit.get();
+    }
+
+    public void setReachers(double power){
+        leftReacher.set(power);
+        rightReacher.set(power);
     }
 
     @Override

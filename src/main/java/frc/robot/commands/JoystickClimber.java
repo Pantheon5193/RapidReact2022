@@ -40,17 +40,19 @@ public class JoystickClimber extends CommandBase {
   @Override
   public void execute() {
       if (Math.abs(controller.getRightY()) > .2) {
-          m_Climber.setPowerRightWinch(controller.getRightY());
+          //m_Climber.setPowerRightWinch(controller.getRightY());
       } else {
           m_Climber.setPowerRightWinch(0);
       }
 
       if (Math.abs(controller.getLeftY()) > .2) {
-          m_Climber.setPowerLeftWinch(controller.getLeftY());
+         // m_Climber.setPowerLeftWinch(controller.getLeftY());
       } else {
           m_Climber.setPowerLeftWinch(0);
       }
-
+      m_Climber.setReachers(.8);
+    
+    SmartDashboard.putBoolean("Bottom Limit", m_Climber.getTouch());
     SmartDashboard.putNumber("Left Encoder: ", m_Climber.getLeftEncoder());
     SmartDashboard.putNumber("Right Encoder: ", m_Climber.getRightEncoder());
     
