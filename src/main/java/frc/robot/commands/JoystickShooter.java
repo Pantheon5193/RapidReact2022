@@ -17,6 +17,7 @@ public class JoystickShooter extends CommandBase {
   private final Shooter m_shooter;
   private XboxController controller;
   private boolean touchytouch = false;
+  private boolean shooterToggle = false;
 
   /**
    * Creates a new ExampleCommand.
@@ -44,7 +45,11 @@ public class JoystickShooter extends CommandBase {
     }
     
 
-    if(controller.getAButton()){
+    if(controller.getAButtonPressed()){
+      shooterToggle = !shooterToggle;
+    }
+
+    if(shooterToggle){
       m_shooter.setPowerIntake(() -> 1);
     }else{
       m_shooter.setPowerIntake(() -> 0);
