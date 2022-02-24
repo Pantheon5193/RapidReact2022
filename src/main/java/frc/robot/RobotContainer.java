@@ -38,9 +38,9 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    //driveTrain.setDefaultCommand(joystickDrive);
-    //shooter.setDefaultCommand(joystickShooter);
-    climber.setDefaultCommand(joystickClimber);
+    driveTrain.setDefaultCommand(joystickDrive);
+    shooter.setDefaultCommand(joystickShooter);
+    //climber.setDefaultCommand(joystickClimber);
 
   }
 

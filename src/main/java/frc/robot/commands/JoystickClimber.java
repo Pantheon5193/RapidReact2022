@@ -50,7 +50,7 @@ public class JoystickClimber extends CommandBase {
       } else {
           m_Climber.setPowerLeftWinch(0);
       }
-      m_Climber.setReachers(.8);
+      //m_Climber.setReachers(.8);
     
     SmartDashboard.putBoolean("Bottom Limit", m_Climber.getTouch());
     SmartDashboard.putNumber("Left Encoder: ", m_Climber.getLeftEncoder());
