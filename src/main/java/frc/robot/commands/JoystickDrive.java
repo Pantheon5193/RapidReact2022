@@ -9,6 +9,9 @@ import frc.robot.subsystems.ExampleSubsystem;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -16,6 +19,10 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /** An example command that uses an example subsystem. */
 public class JoystickDrive extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+  NetworkTableEntry tx = table.getEntry("tx");
+  NetworkTableEntry ty = table.getEntry("ty");
+  NetworkTableEntry ta = table.getEntry("ta");
   private final DriveTrain m_driveTrain;
   private XboxController controller;
   private DoubleSupplier leftP;
@@ -77,14 +84,18 @@ public class JoystickDrive extends CommandBase {
       m_driveTrain.setPower(0, 0);
     }
 
+    double x = tx.getDouble(0.0);
+    double y = ty.getDouble(0.0);
+    double area = ta.getDouble(0.0);
+
     SmartDashboard.putNumber("Left Power", leftP.getAsDouble());
     SmartDashboard.putNumber("Right Power", rightP.getAsDouble());
     SmartDashboard.putNumber("Gyro", m_driveTrain.getAngle());
     SmartDashboard.putBoolean("Drive Toggle", driveStraightToggle);
     SmartDashboard.putNumber("TargetAngle", targetAngle);
-    
-
-    
+    SmartDashboard.putNumber("LimelightX", x);
+    SmartDashboard.putNumber("LimelightY", y);
+    SmartDashboard.putNumber("LimelightArea", area);
   }
 
   // Called once the command ends or is interrupted.

@@ -7,6 +7,13 @@ package frc.robot.commands;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
+
+import com.fasterxml.jackson.annotation.JacksonInject.Value;
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -15,9 +22,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class JoystickShooter extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Shooter m_shooter;
+  private Timer timer = new Timer();
   private XboxController controller;
   private boolean touchytouch = false;
   private boolean shooterToggle = false;
+  private int ballCount =0;
+  private int i;
 
   /**
    * Creates a new ExampleCommand.
@@ -33,13 +43,15 @@ public class JoystickShooter extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    ballCount=0;
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     if(controller.getLeftTriggerAxis()>.5){
-      m_shooter.setPowerShooter(() -> .85);
+      m_shooter.setPowerShooter(() -> .3);
     }else{
       m_shooter.setPowerShooter(() ->0);
     }
@@ -54,11 +66,22 @@ public class JoystickShooter extends CommandBase {
     }else{
       m_shooter.setPowerIntake(() -> 0);
     }
-
+    if(sensorUpdate()){
+      timer.start();
+      ballCount++;
+    }
+    if(timer.get()>.25){
+      timer.stop();
+      timer.reset();
+    }
     if(controller.getBButton()){
       m_shooter.setPowerIndex(() ->-.3);
-    }else if(m_shooter.getDistance()>125){
-      m_shooter.setPowerIndex(() -> -.3);
+    }else if(timer.get()>0){
+      if(ballCount==1 && timer.get()<.25){
+        m_shooter.setPowerIndex(() ->-.3);
+      }else if(ballCount==2 && timer.get()<.25){
+        m_shooter.setPowerIndex(() ->-.3);
+      }
     }else{
       m_shooter.setPowerIndex(() -> 0);
     }
@@ -66,6 +89,11 @@ public class JoystickShooter extends CommandBase {
     touchytouch = m_shooter.touch();
     SmartDashboard.putNumber("Distance Sensor", m_shooter.getDistance());
     SmartDashboard.putBoolean("TopLeftTouch", touchytouch);
+    SmartDashboard.putBoolean("Sensor Update", sensorUpdate());
+    SmartDashboard.putNumber("Timer", timer.get());
+    SmartDashboard.putNumber("BallCount", ballCount);
+    SmartDashboard.putNumber("I",i);
+
   }
 
   // Called once the command ends or is interrupted.
@@ -76,5 +104,16 @@ public class JoystickShooter extends CommandBase {
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  public boolean sensorUpdate(){
+    boolean value = false;
+    if(m_shooter.getDistance()>125 && i==0){
+      i=1;
+      value = true;
+    }else if(m_shooter.getDistance()<125){
+      i=0;
+    }
+    return value;
   }
 }
