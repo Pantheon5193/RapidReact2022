@@ -30,6 +30,7 @@ public class JoystickDrive extends CommandBase {
   private boolean driveStraightToggle = false;
   private double targetAngle;
   private double averagePow;
+  private double angleToGoalDeg;
 
 
   /**
@@ -58,6 +59,7 @@ public class JoystickDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_driveTrain.setServo(.85); //Low Value is .575
     averagePow= (Math.pow(leftP.getAsDouble(), 3)+Math.pow(rightP.getAsDouble(), 3))/2;
     if (((Math.abs(leftP.getAsDouble()) > .5) && (Math.abs(rightP.getAsDouble()) > .5)) && !driveStraightToggle &&
         ((Math.abs(Math.round(leftP.getAsDouble()) + Math.round(rightP.getAsDouble())) == 2))) { // This long if statement checks
@@ -87,7 +89,7 @@ public class JoystickDrive extends CommandBase {
     double x = tx.getDouble(0.0);
     double y = ty.getDouble(0.0);
     double area = ta.getDouble(0.0);
-
+    angleToGoalDeg = 35 +y;
     SmartDashboard.putNumber("Left Power", leftP.getAsDouble());
     SmartDashboard.putNumber("Right Power", rightP.getAsDouble());
     SmartDashboard.putNumber("Gyro", m_driveTrain.getAngle());
@@ -96,6 +98,7 @@ public class JoystickDrive extends CommandBase {
     SmartDashboard.putNumber("LimelightX", x);
     SmartDashboard.putNumber("LimelightY", y);
     SmartDashboard.putNumber("LimelightArea", area);
+    SmartDashboard.putNumber("Distance to Goal", (104-31)/(Math.tan(Math.toRadians(angleToGoalDeg))));
   }
 
   // Called once the command ends or is interrupted.

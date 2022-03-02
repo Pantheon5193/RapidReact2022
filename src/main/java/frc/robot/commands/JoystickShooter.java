@@ -51,12 +51,19 @@ public class JoystickShooter extends CommandBase {
   @Override
   public void execute() {
     if(controller.getLeftTriggerAxis()>.5){
-      m_shooter.setPowerShooter(() -> .3);
+      m_shooter.setPowerShooter(() -> .8);
     }else{
       m_shooter.setPowerShooter(() ->0);
     }
-    
+    //Target should be at 3.2777 on x
+    //22 - .65
+    //60 - .7
 
+    //Old Dat
+    //82 - .7
+    //
+    //106 - .8     
+    //130 - .9
     if(controller.getAButtonPressed()){
       shooterToggle = !shooterToggle;
     }

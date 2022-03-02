@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -13,8 +14,8 @@ public class Climber extends SubsystemBase{
     public Climber(){}
     private TalonFX leftWinch = new TalonFX(9);
     private TalonFX rightWinch = new TalonFX(10);
-    private CANSparkMax leftReacher = new CANSparkMax(11,MotorType.kBrushless);
-    private CANSparkMax rightReacher = new CANSparkMax(12,MotorType.kBrushless);
+    private CANSparkMax leftReacher = new CANSparkMax(12,MotorType.kBrushless);
+    private CANSparkMax rightReacher = new CANSparkMax(11,MotorType.kBrushless);
     private DigitalInput bottomLimit = new DigitalInput(9);
 
     public void setPowerRightWinch(double rightP){
@@ -24,9 +25,19 @@ public class Climber extends SubsystemBase{
         leftWinch.set(ControlMode.PercentOutput, leftP);
     }
 
+    public void setLeftReacher(double leftP){
+        leftReacher.set(leftP);
+    }
+
+    public void setRightReacher(double rightP){
+        rightReacher.set(rightP);
+    }
+
     public void setNeutralMode(){
         leftWinch.setNeutralMode(NeutralMode.Brake);
         rightWinch.setNeutralMode(NeutralMode.Brake);
+        leftReacher.setIdleMode(IdleMode.kBrake);
+        rightReacher.setIdleMode(IdleMode.kBrake);
     }
 
     public double getLeftEncoder(){

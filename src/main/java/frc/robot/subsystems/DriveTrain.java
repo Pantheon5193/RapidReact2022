@@ -9,8 +9,10 @@ import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 
 
   public class DriveTrain extends SubsystemBase {
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
     private TalonFX fr = new TalonFX(1);
     private TalonFX bl = new TalonFX(4);
     private TalonFX br = new TalonFX(3);
+    private Servo vision = new Servo(0);
     private AHRS gyro = new AHRS(Port.kMXP);
 
 
@@ -39,6 +42,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
   public double getAngle(){
     return gyro.getAngle();
+  }
+
+  public void setServo(double pos){
+    vision.set(pos);
   }
 
   public void resetGyro(){

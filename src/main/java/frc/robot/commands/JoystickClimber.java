@@ -40,15 +40,19 @@ public class JoystickClimber extends CommandBase {
   @Override
   public void execute() {
       if (Math.abs(controller.getRightY()) > .2) {
-          //m_Climber.setPowerRightWinch(controller.getRightY());
+          m_Climber.setPowerRightWinch(controller.getRightY());
+          //m_Climber.setRightReacher(controller.getRightY()/8);
       } else {
           m_Climber.setPowerRightWinch(0);
+          m_Climber.setRightReacher(0);
       }
 
       if (Math.abs(controller.getLeftY()) > .2) {
-         // m_Climber.setPowerLeftWinch(controller.getLeftY());
+         m_Climber.setPowerLeftWinch(controller.getLeftY());
+         //m_Climber.setLeftReacher(controller.getLeftY()/8);
       } else {
           m_Climber.setPowerLeftWinch(0);
+          m_Climber.setLeftReacher(0);
       }
       //m_Climber.setReachers(.8);
     
