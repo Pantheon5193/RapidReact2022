@@ -55,6 +55,12 @@ public class JoystickShooter extends CommandBase {
     }else{
       m_shooter.setPowerShooter(() ->0);
     }
+
+    if(controller.getRightTriggerAxis()>.1){
+      m_shooter.setPowerIntake(() -> controller.getRightTriggerAxis());
+    }else{
+      m_shooter.setPowerIntake(() -> 0);
+    }
     //Target should be at 3.2777 on x
     //22 - .65
     //60 - .7
@@ -64,15 +70,18 @@ public class JoystickShooter extends CommandBase {
     //
     //106 - .8     
     //130 - .9
-    if(controller.getAButtonPressed()){
-      shooterToggle = !shooterToggle;
-    }
+    // if(controller.getAButtonPressed()){
+    //   shooterToggle = !shooterToggle;
+    // }
 
-    if(shooterToggle){
-      m_shooter.setPowerIntake(() -> 1);
-    }else{
-      m_shooter.setPowerIntake(() -> 0);
+    if(controller.getBButton()){
+      m_shooter.setPowerIntake(() -> -.5);
     }
+    // if(shooterToggle){
+    //   m_shooter.setPowerIntake(() -> 1);
+    // }else{
+    //   m_shooter.setPowerIntake(() -> 0);
+    // }
     if(sensorUpdate()){
       timer.start();
       ballCount++;
@@ -81,7 +90,7 @@ public class JoystickShooter extends CommandBase {
       timer.stop();
       timer.reset();
     }
-    if(controller.getBButton()){
+    if(controller.getRightBumper()){
       m_shooter.setPowerIndex(() ->-.3);
     }else if(timer.get()>0){
       if(ballCount==1 && timer.get()<.25){
@@ -89,6 +98,8 @@ public class JoystickShooter extends CommandBase {
       }else if(ballCount==2 && timer.get()<.25){
         m_shooter.setPowerIndex(() ->-.3);
       }
+    }else if(controller.getLeftBumper()){
+      m_shooter.setPowerIndex(() -> .3);
     }else{
       m_shooter.setPowerIndex(() -> 0);
     }
