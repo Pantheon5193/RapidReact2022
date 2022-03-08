@@ -44,6 +44,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
     return gyro.getAngle();
   }
 
+  public double getEncoderCount(){
+    return fl.getSelectedSensorPosition();
+  }
+
   public void setServo(double pos){
     vision.set(pos);
   }
@@ -51,6 +55,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
   public void resetGyro(){
     gyro.reset();
   }
+
+  public void resetEncoder(){
+    fl.setSelectedSensorPosition(0);
+  }
+  
   
   @Override
   public void periodic() {

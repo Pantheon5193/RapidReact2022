@@ -52,6 +52,7 @@ public class JoystickDrive extends CommandBase {
   public void initialize() {
     m_driveTrain.resetGyro();
     m_driveTrain.coastMode();
+    m_driveTrain.resetEncoder();
     // m_driveTrain.resetEncoder(); Do this eventually please
     //I hate science fair
   }
@@ -59,6 +60,9 @@ public class JoystickDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double x = tx.getDouble(0.0);
+    double y = ty.getDouble(0.0);
+    double area = ta.getDouble(0.0);
     m_driveTrain.setServo(.85); //Low Value is .575
     averagePow= (Math.pow(leftP.getAsDouble(), 3)+Math.pow(rightP.getAsDouble(), 3))/2;
     if (((Math.abs(leftP.getAsDouble()) > .5) && (Math.abs(rightP.getAsDouble()) > .5)) && !driveStraightToggle &&
@@ -82,16 +86,19 @@ public class JoystickDrive extends CommandBase {
         && !driveStraightToggle) { // Cubed control if none of the above conditions apply but the sticks are
                                    // pressed above a threshold
       m_driveTrain.setPower(Math.pow((leftP.getAsDouble()), 3), Math.pow((rightP.getAsDouble()), 3));
+    }else if(controller.getYButtonPressed()){
+      m_driveTrain.resetGyro();
+    }else if(controller.getYButton()){
+      if(area!=0){
+        m_driveTrain.setPower(-x/ 60, x/60);
+      }
     } else {// Obligitory turning it off
       m_driveTrain.setPower(0, 0);
     }
 
-    double x = tx.getDouble(0.0);
-    double y = ty.getDouble(0.0);
-    double area = ta.getDouble(0.0);
+    
     angleToGoalDeg = 35 +y;
-    SmartDashboard.putNumber("Left Power", leftP.getAsDouble());
-    SmartDashboard.putNumber("Right Power", rightP.getAsDouble());
+    SmartDashboard.putNumber("Encoder", m_driveTrain.getEncoderCount());
     SmartDashboard.putNumber("Gyro", m_driveTrain.getAngle());
     SmartDashboard.putBoolean("Drive Toggle", driveStraightToggle);
     SmartDashboard.putNumber("TargetAngle", targetAngle);
@@ -103,7 +110,9 @@ public class JoystickDrive extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_driveTrain.coastMode();
+  }
 
   // Returns true when the command should end.
   @Override

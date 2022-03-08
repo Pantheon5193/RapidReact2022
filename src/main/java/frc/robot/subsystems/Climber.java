@@ -16,7 +16,10 @@ public class Climber extends SubsystemBase{
     private TalonFX rightWinch = new TalonFX(10);
     private CANSparkMax leftReacher = new CANSparkMax(12,MotorType.kBrushless);
     private CANSparkMax rightReacher = new CANSparkMax(11,MotorType.kBrushless);
-    private DigitalInput bottomLimit = new DigitalInput(9);
+    private DigitalInput bottomRightTouch = new DigitalInput(2);
+    private DigitalInput bottomLeftTouch = new DigitalInput(3);
+    private DigitalInput topRightTouch = new DigitalInput(0);
+    private DigitalInput topLeftTouch = new DigitalInput(1);
 
     public void setPowerRightWinch(double rightP){
         rightWinch.set(ControlMode.PercentOutput, rightP);
@@ -46,13 +49,30 @@ public class Climber extends SubsystemBase{
     public double getRightEncoder(){
         return rightWinch.getSelectedSensorPosition();
     }
-    public boolean getTouch(){
-        return bottomLimit.get();
+
+    public void resetEncoder(int i){
+        if(i==0){
+            
+          }else if(i==1){
+            
+          }else if(i==2){
+            rightWinch.setSelectedSensorPosition(0);
+          }else{
+            leftWinch.setSelectedSensorPosition(0);
+          }
     }
 
-    public void setReachers(double power){
-        leftReacher.set(power);
-        rightReacher.set(power);
+    public boolean touch(int i){
+        if(i==0){
+          return bottomRightTouch.get();
+        }else if(i==1){
+          return bottomLeftTouch.get();
+        }else if(i==2){
+          return topRightTouch.get();
+        }else{
+          return topLeftTouch.get();
+        }
+        
     }
 
     @Override

@@ -17,15 +17,17 @@ public class JoystickClimber extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Climber m_Climber;
   private XboxController controller;
+  private XboxController controller2;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public JoystickClimber(Climber subsystem, XboxController gamepad) {
+  public JoystickClimber(Climber subsystem, XboxController gamepad, XboxController gamepad2) {
     m_Climber = subsystem;
     controller = gamepad;
+    controller2 = gamepad2;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
@@ -40,11 +42,14 @@ public class JoystickClimber extends CommandBase {
   @Override
   public void execute() {
       if (Math.abs(controller.getRightY()) > .2) {
+        if(!m_Climber.touch(2)){
+          m_Climber.setPowerRightWinch(Math.min(controller.getRightY(), 0));
+          m_Climber.resetEncoder(2);
+        }else{
           m_Climber.setPowerRightWinch(controller.getRightY());
-          //m_Climber.setRightReacher(controller.getRightY()/8);
+        }
       } else {
           m_Climber.setPowerRightWinch(0);
-          m_Climber.setRightReacher(0);
       }
 
       if (Math.abs(controller.getLeftY()) > .2) {
@@ -52,11 +57,26 @@ public class JoystickClimber extends CommandBase {
          //m_Climber.setLeftReacher(controller.getLeftY()/8);
       } else {
           m_Climber.setPowerLeftWinch(0);
-          m_Climber.setLeftReacher(0);
       }
-      //m_Climber.setReachers(.8);
-    
-    SmartDashboard.putBoolean("Bottom Limit", m_Climber.getTouch());
+      
+      if (Math.abs(controller2.getRightY()) > .2) {
+        //m_Climber.setPowerRightWinch(controller.getRightY());
+        m_Climber.setRightReacher(controller2.getRightY()/4);
+      } else {
+        m_Climber.setRightReacher(0);
+      }
+      
+      if (Math.abs(controller2.getLeftY()) > .2) {
+        //m_Climber.setPowerRightWinch(controller.getRightY());
+        m_Climber.setLeftReacher(-controller2.getLeftY()/2);
+      } else {
+        m_Climber.setLeftReacher(0);
+      }
+    SmartDashboard.putBoolean("Touch BR", m_Climber.touch(0));
+    SmartDashboard.putBoolean("Touch BL", m_Climber.touch(1));
+    SmartDashboard.putBoolean("Touch TR", m_Climber.touch(2));
+    SmartDashboard.putBoolean("Touch TL", m_Climber.touch(3));
+    SmartDashboard.putNumber("Right Stick", controller.getRightY());
     SmartDashboard.putNumber("Left Encoder: ", m_Climber.getLeftEncoder());
     SmartDashboard.putNumber("Right Encoder: ", m_Climber.getRightEncoder());
     

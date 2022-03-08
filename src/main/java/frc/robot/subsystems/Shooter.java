@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -24,11 +25,23 @@ public class Shooter extends SubsystemBase {
   private VictorSPX intake = new VictorSPX(7);
   private VictorSPX index = new VictorSPX(8);
   private ColorSensorV3 cdSeneor = new ColorSensorV3(I2C.Port.kOnboard);
-  private DigitalInput topLeftTouch = new DigitalInput(4);
+  
 
-  public void setPowerShooter(DoubleSupplier power){
-    leftShooter.set(ControlMode.PercentOutput, power.getAsDouble());
-    rightShooter.set(ControlMode.PercentOutput, -power.getAsDouble());
+  public void setPowerShooter(double power){
+    leftShooter.set(ControlMode.Velocity, power);
+    rightShooter.set(ControlMode.Follower, 6);
+  }
+
+  public void stopShooters(){
+    leftShooter.set(ControlMode.PercentOutput, 0);
+    rightShooter.set(ControlMode.PercentOutput, 0);
+  }
+
+  public void configShooterPID(){
+    leftShooter.config_kF(0, 0.06);
+    leftShooter.config_kP(0, 0.16);
+    leftShooter.config_kD(0, 10);
+    rightShooter.setInverted(InvertType.OpposeMaster);
   }
 
   public void setPowerIntake(DoubleSupplier power){
@@ -44,13 +57,20 @@ public class Shooter extends SubsystemBase {
     return cdSeneor.getProximity();
   }
 
-  public boolean touch(){
-    return topLeftTouch.get();
+  public double getLeftVelocity(){
+   return leftShooter.getSelectedSensorVelocity();     
   }
+
+  public double getRightVelocity(){
+    return rightShooter.getSelectedSensorVelocity();     
+   }
+
+  
   
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    
   }
 
   @Override

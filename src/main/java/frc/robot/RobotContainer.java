@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -12,11 +13,20 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.JoystickClimber;
 import frc.robot.commands.JoystickDrive;
 import frc.robot.commands.JoystickShooter;
+import frc.robot.commands.Auton.AutonAdjust;
+import frc.robot.commands.Auton.AutonDriveStraight;
+import frc.robot.commands.Auton.AutonIndex;
+import frc.robot.commands.Auton.AutonIntake;
+import frc.robot.commands.Auton.AutonShooter;
+import frc.robot.commands.Auton.AutonShooterStop;
+import frc.robot.commands.Auton.AutonTurn;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,6 +38,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   
   private final XboxController controller = new XboxController(0);
+  private final XboxController controller2 = new XboxController(1);
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   private final DriveTrain driveTrain = new DriveTrain();
@@ -35,16 +46,14 @@ public class RobotContainer {
   private final Climber climber = new Climber();
   private final JoystickShooter joystickShooter = new JoystickShooter(shooter,controller);
   private final JoystickDrive joystickDrive = new JoystickDrive(driveTrain, controller);
-  private final JoystickClimber joystickClimber = new JoystickClimber(climber, controller);
+  private final JoystickClimber joystickClimber = new JoystickClimber(climber, controller, controller2);
+  
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    driveTrain.setDefaultCommand(joystickDrive);
-    shooter.setDefaultCommand(joystickShooter);
-    //climber.setDefaultCommand(joystickClimber);
 
   }
 
@@ -64,6 +73,29 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return new SequentialCommandGroup(
+        new ParallelCommandGroup(new AutonDriveStraight(driveTrain, 50000), new AutonIntake(shooter, 1)),
+        new AutonIntake(shooter, 0),
+        new AutonTurn(driveTrain, 190),
+        new ParallelCommandGroup(new AutonAdjust(driveTrain), new AutonShooter(shooter,15500)),
+        new AutonIndex(shooter, -.5, .25),
+        new AutonIndex(shooter, 0, 1),
+        new AutonIndex(shooter, -.5, .5),
+        new AutonIndex(shooter, 0, .1),
+        new AutonShooterStop(shooter)
+        );
+  }
+
+  public Command getDriveCommand(){
+    //return joystickDrive;
+    return null;
+  }
+  public Command getShooterCommand(){
+    //return joystickShooter;
+    return null;
+  }
+  public Command getClimberCommand(){
+    return joystickClimber;
+    //return null;
   }
 }
