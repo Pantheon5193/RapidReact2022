@@ -44,8 +44,8 @@ public class RobotContainer {
   private final DriveTrain driveTrain = new DriveTrain();
   private final Shooter shooter = new Shooter();
   private final Climber climber = new Climber();
-  private final JoystickShooter joystickShooter = new JoystickShooter(shooter,controller);
-  private final JoystickDrive joystickDrive = new JoystickDrive(driveTrain, controller);
+  private final JoystickShooter joystickShooter = new JoystickShooter(shooter,controller, controller2);
+  private final JoystickDrive joystickDrive = new JoystickDrive(driveTrain, controller, controller2);
   private final JoystickClimber joystickClimber = new JoystickClimber(climber, controller, controller2);
   
   
@@ -87,12 +87,12 @@ public class RobotContainer {
   }
 
   public Command getDriveCommand(){
-    //return joystickDrive;
-    return null;
+    return joystickDrive;
+    //return null;
   }
   public Command getShooterCommand(){
-    //return joystickShooter;
-    return null;
+    return joystickShooter;
+    //return null;
   }
   public Command getClimberCommand(){
     return joystickClimber;

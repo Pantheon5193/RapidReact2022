@@ -23,7 +23,7 @@ public class AutonTurn extends CommandBase {
   private final DriveTrain m_driveTrain;
   private double angle;
   private Timer timer = new Timer();
-  double P = 0.0015;
+  double P = 0.003;
   double I = 0;//0.001;
   double D = 0;//0.0003;
   double error = 0;

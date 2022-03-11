@@ -3,11 +3,14 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxRelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase{
@@ -16,6 +19,8 @@ public class Climber extends SubsystemBase{
     private TalonFX rightWinch = new TalonFX(10);
     private CANSparkMax leftReacher = new CANSparkMax(12,MotorType.kBrushless);
     private CANSparkMax rightReacher = new CANSparkMax(11,MotorType.kBrushless);
+    private RelativeEncoder rightEncoder = rightReacher.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor,42);
+    private RelativeEncoder leftEncoder = leftReacher.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor,42);
     private DigitalInput bottomRightTouch = new DigitalInput(2);
     private DigitalInput bottomLeftTouch = new DigitalInput(3);
     private DigitalInput topRightTouch = new DigitalInput(0);
@@ -43,18 +48,23 @@ public class Climber extends SubsystemBase{
         rightReacher.setIdleMode(IdleMode.kBrake);
     }
 
-    public double getLeftEncoder(){
+    public double getLeftWinchEncoder(){
         return leftWinch.getSelectedSensorPosition();
     }
-    public double getRightEncoder(){
+    public double getRightWinchEncoder(){
         return rightWinch.getSelectedSensorPosition();
     }
-
+    public double getLeftReacherEncoder(){
+        return leftEncoder.getPosition();
+    }
+    public double getRightReacherEncoder(){
+        return rightEncoder.getPosition();
+    }
     public void resetEncoder(int i){
         if(i==0){
-            
+            rightEncoder.setPosition(0);
           }else if(i==1){
-            
+            leftEncoder.setPosition(0);
           }else if(i==2){
             rightWinch.setSelectedSensorPosition(0);
           }else{

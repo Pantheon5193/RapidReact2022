@@ -25,9 +25,11 @@ public class JoystickDrive extends CommandBase {
   NetworkTableEntry ta = table.getEntry("ta");
   private final DriveTrain m_driveTrain;
   private XboxController controller;
+  private XboxController controller2;
   private DoubleSupplier leftP;
   private DoubleSupplier rightP;
   private boolean driveStraightToggle = false;
+  private boolean climbToggle = false;
   private double targetAngle;
   private double averagePow;
   private double angleToGoalDeg;
@@ -38,9 +40,10 @@ public class JoystickDrive extends CommandBase {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public JoystickDrive(DriveTrain subsystem, XboxController gamepad) {
+  public JoystickDrive(DriveTrain subsystem, XboxController gamepad, XboxController gamepad2) {
     m_driveTrain = subsystem;
     controller = gamepad;
+    controller2 = gamepad2;
     leftP = ()->controller.getLeftY();
     rightP = ()->controller.getRightY();
     // Use addRequirements() here to declare subsystem dependencies.
@@ -60,52 +63,71 @@ public class JoystickDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double x = tx.getDouble(0.0);
-    double y = ty.getDouble(0.0);
-    double area = ta.getDouble(0.0);
-    m_driveTrain.setServo(.85); //Low Value is .575
-    averagePow= (Math.pow(leftP.getAsDouble(), 3)+Math.pow(rightP.getAsDouble(), 3))/2;
-    if (((Math.abs(leftP.getAsDouble()) > .5) && (Math.abs(rightP.getAsDouble()) > .5)) && !driveStraightToggle &&
-        ((Math.abs(Math.round(leftP.getAsDouble()) + Math.round(rightP.getAsDouble())) == 2))) { // This long if statement checks
-                                                                                       // if the sticks are pressed and
-                                                                                       // sets the angle to
-                                                                                       // automatically adjust to
-      targetAngle = m_driveTrain.getAngle();
-      driveStraightToggle = true;
-    } else if ((Math.abs(leftP.getAsDouble()) < .5) || (Math.abs(rightP.getAsDouble()) < .5)) {// If sticks are let go
-      driveStraightToggle = false;
-    }
-    if ((driveStraightToggle) && (leftP.getAsDouble() > 0)) {// Now this is auto correct with driving backward
-      m_driveTrain.setPower(averagePow - ((targetAngle - m_driveTrain.getAngle()) / 90),
-          averagePow - ((targetAngle - m_driveTrain.getAngle()) / 90));
-
-    } else if ((driveStraightToggle) && (leftP.getAsDouble() < 0)) {// Now this is auto correct with driving forward
-      m_driveTrain.setPower(averagePow + ((targetAngle - m_driveTrain.getAngle()) / 90),
-          (averagePow + ((targetAngle - m_driveTrain.getAngle()) / 90)));
-    } else if (((Math.abs(leftP.getAsDouble()) > .2) || (Math.abs((rightP.getAsDouble())) > .2))
-        && !driveStraightToggle) { // Cubed control if none of the above conditions apply but the sticks are
-                                   // pressed above a threshold
-      m_driveTrain.setPower(Math.pow((leftP.getAsDouble()), 3), Math.pow((rightP.getAsDouble()), 3));
-    }else if(controller.getYButtonPressed()){
-      m_driveTrain.resetGyro();
-    }else if(controller.getYButton()){
-      if(area!=0){
-        m_driveTrain.setPower(-x/ 60, x/60);
+    if(controller2.getBButtonPressed()){
+      if(climbToggle){
+        climbToggle= false;
+      }else{
+        climbToggle = true;
       }
-    } else {// Obligitory turning it off
-      m_driveTrain.setPower(0, 0);
     }
 
+    if(!climbToggle){
+      double x = tx.getDouble(0.0);
+      double y = ty.getDouble(0.0);
+      double area = ta.getDouble(0.0);
+      
+      averagePow= (Math.pow(leftP.getAsDouble(), 3)+Math.pow(rightP.getAsDouble(), 3))/2;
+      if (((Math.abs(leftP.getAsDouble()) > .5) && (Math.abs(rightP.getAsDouble()) > .5)) && !driveStraightToggle &&
+          ((Math.abs(Math.round(leftP.getAsDouble()) + Math.round(rightP.getAsDouble())) == 2))) { // This long if statement checks
+                                                                                         // if the sticks are pressed and
+                                                                                         // sets the angle to
+                                                                                         // automatically adjust to
+        targetAngle = m_driveTrain.getAngle();
+        driveStraightToggle = true;
+      } else if ((Math.abs(leftP.getAsDouble()) < .5) || (Math.abs(rightP.getAsDouble()) < .5)) {// If sticks are let go
+        driveStraightToggle = false;
+      }
+      if ((driveStraightToggle) && (leftP.getAsDouble() > 0)) {// Now this is auto correct with driving backward
+        m_driveTrain.setPower(averagePow - ((targetAngle - m_driveTrain.getAngle()) / 90),
+            averagePow - ((targetAngle - m_driveTrain.getAngle()) / 90));
+  
+      } else if ((driveStraightToggle) && (leftP.getAsDouble() < 0)) {// Now this is auto correct with driving forward
+        m_driveTrain.setPower(averagePow + ((targetAngle - m_driveTrain.getAngle()) / 90),
+            (averagePow + ((targetAngle - m_driveTrain.getAngle()) / 90)));
+      } else if (((Math.abs(leftP.getAsDouble()) > .2) || (Math.abs((rightP.getAsDouble())) > .2))
+          && !driveStraightToggle) { // Cubed control if none of the above conditions apply but the sticks are
+                                     // pressed above a threshold
+        m_driveTrain.setPower(Math.pow((leftP.getAsDouble()), 3), Math.pow((rightP.getAsDouble()), 3));
+      }else if(controller.getYButtonPressed()){
+        m_driveTrain.resetGyro();
+      }else if(controller.getYButton()){
+        if(area!=0){
+          m_driveTrain.setPower(-x/ 60, x/60);
+        }
+      } else {// Obligitory turning it off
+        m_driveTrain.setPower(0, 0);
+      }
+      if(controller.getYButton()){
+        m_driveTrain.setServo(.85); //Low Value is .
+        table.getEntry("pipeline").setNumber(0);
+        //SmartDashboard.putNumber("Distance to Goal", (104-31)/(Math.tan(Math.toRadians(angleToGoalDeg))));
+      }else{
+        m_driveTrain.setServo(.575);
+        table.getEntry("pipeline").setNumber(1);
+      }
+  
+      
+      angleToGoalDeg = 35 +y;
+      SmartDashboard.putNumber("Encoder", m_driveTrain.getEncoderCount());
+      SmartDashboard.putNumber("Gyro", m_driveTrain.getAngle());
+      SmartDashboard.putBoolean("Drive Toggle", driveStraightToggle);
+      SmartDashboard.putNumber("TargetAngle", targetAngle);
+      SmartDashboard.putNumber("LimelightX", x);
+      SmartDashboard.putNumber("LimelightY", y);
+      SmartDashboard.putNumber("LimelightArea", area);
+    }
     
-    angleToGoalDeg = 35 +y;
-    SmartDashboard.putNumber("Encoder", m_driveTrain.getEncoderCount());
-    SmartDashboard.putNumber("Gyro", m_driveTrain.getAngle());
-    SmartDashboard.putBoolean("Drive Toggle", driveStraightToggle);
-    SmartDashboard.putNumber("TargetAngle", targetAngle);
-    SmartDashboard.putNumber("LimelightX", x);
-    SmartDashboard.putNumber("LimelightY", y);
-    SmartDashboard.putNumber("LimelightArea", area);
-    SmartDashboard.putNumber("Distance to Goal", (104-31)/(Math.tan(Math.toRadians(angleToGoalDeg))));
+    
   }
 
   // Called once the command ends or is interrupted.

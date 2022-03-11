@@ -22,25 +22,31 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /** An example command that uses an example subsystem. */
 public class JoystickShooter extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
   private final Shooter m_shooter;
   private Timer timer = new Timer();
   private Timer timeoutTimer = new Timer();
   private XboxController controller;
+  private XboxController controller2;
   private boolean touchytouch = false;
   private boolean shooterToggle = false;
+  private boolean climbToggle = false;
   private int ballCount =0;
   private int velocity = 9000;
   private boolean shooterReady = false;
   private int i;
+  private double distanceToGoal =0;
+  private double y = table.getEntry("ty").getDouble(0);
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public JoystickShooter(Shooter subsystem, XboxController gamepad) {
+  public JoystickShooter(Shooter subsystem, XboxController gamepad, XboxController gamepad2) {
     m_shooter = subsystem;
     controller = gamepad;
+    controller2 = gamepad2;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
@@ -55,18 +61,20 @@ public class JoystickShooter extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if(controller2.getBButtonPressed()){
+      if(climbToggle){
+        climbToggle= false;
+      }else{
+        climbToggle = true;
+      }
+    }
+
+    if(!climbToggle){
+      y = table.getEntry("ty").getDouble(0);
     if(controller.getLeftTriggerAxis()>.5){
       m_shooter.setPowerShooter(velocity);
     }else{
       m_shooter.stopShooters();
-    }
-
-    if(controller.getPOV()==90 && timeoutTimer.get() ==0){
-      velocity+=500;
-      timeoutTimer.start();
-    }else if(controller.getPOV()==270 &&timeoutTimer.get() ==0){
-      velocity-=500;
-      timeoutTimer.start();
     }
 
     if(timeoutTimer.get()>.2){
@@ -74,8 +82,19 @@ public class JoystickShooter extends CommandBase {
       timeoutTimer.reset();
     }
 
+    
+    //130 to 118 -16500
+    //118-103 - 15000
+    //103-96-14000
+    //96-83   13000
+    //83-73 12500
+    //73-63 12000
+    //63-54   11500
+
     if(controller.getRightTriggerAxis()>.1){
       m_shooter.setPowerIntake(() -> controller.getRightTriggerAxis());
+    }else if(controller.getBButton()){
+      m_shooter.setPowerIntake(() -> -.5);
     }else{
       m_shooter.setPowerIntake(() -> 0);
     }
@@ -92,9 +111,7 @@ public class JoystickShooter extends CommandBase {
     //   shooterToggle = !shooterToggle;
     // }
 
-    if(controller.getBButton()){
-      m_shooter.setPowerIntake(() -> -.5);
-    }
+    
     // if(shooterToggle){
     //   m_shooter.setPowerIntake(() -> 1);
     // }else{
@@ -108,10 +125,13 @@ public class JoystickShooter extends CommandBase {
       timer.stop();
       timer.reset();
     }
-    if(controller.getRightBumper()){
+    if(controller.getRightBumperPressed()){
+      timeoutTimer.start();
+      
+    }else if(timeoutTimer.get()<.2 && timeoutTimer.get()>0){
       m_shooter.setPowerIndex(() ->-.5);
     }else if(timer.get()>0){
-      if(ballCount==1 && m_shooter.getDistance()>125){
+      if(ballCount==1 && m_shooter.getDistance()>150){
         m_shooter.setPowerIndex(() ->-.3);
       }else if(ballCount==2 && timer.get()<.1){
         m_shooter.setPowerIndex(() ->-.3);
@@ -124,23 +144,46 @@ public class JoystickShooter extends CommandBase {
 
     if(Math.abs(m_shooter.getLeftVelocity() - velocity) <600){
       shooterReady = true;
+      ballCount=0;
     }else{
       shooterReady=false;
     }
+    if(controller.getYButton()){
+      if(table.getEntry("ta").getDouble(0)!=0){
+        distanceToGoal = (104-31)/(Math.tan(Math.toRadians(35+y)));
+        if(distanceToGoal>118){
+          velocity=16500;
+        }else if(distanceToGoal>103){
+          velocity = 15000;
+        }else if(distanceToGoal>96){
+          velocity = 14000;
+        }else if(distanceToGoal>83){
+          velocity = 13250;
+        }else if(distanceToGoal>73){
+          velocity = 12500;
+        }else if(distanceToGoal>63){
+          velocity = 12000;
+        }else if(distanceToGoal>50){
+          velocity = 11500;
+        }else if(distanceToGoal>45){
+          velocity = 11000;
+        }
+      }else{
+        velocity = 12000;//low goal 6500
+      }
+      
+    }
 
     SmartDashboard.putNumber("Distance Sensor", m_shooter.getDistance());
-    
+    SmartDashboard.putNumber("Distance to Goal", distanceToGoal);
     SmartDashboard.putBoolean("Sensor Update", sensorUpdate());
     SmartDashboard.putNumber("BallCount", ballCount);
     SmartDashboard.putNumber("Left Power", m_shooter.getLeftVelocity());
     SmartDashboard.putNumber("Right Power", m_shooter.getRightVelocity());
     SmartDashboard.putNumber("Velocity", velocity);
     SmartDashboard.putBoolean("Shooter Ready", shooterReady);
-    //118-16000
-    //52-12000
-    //74 - 12000
-    //low - edge - 7000
-    //low - 2ft 9000
+    SmartDashboard.putBoolean("Climb mode", climbToggle);
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -155,10 +198,10 @@ public class JoystickShooter extends CommandBase {
 
   public boolean sensorUpdate(){
     boolean value = false;
-    if(m_shooter.getDistance()>125 && i==0){
+    if(m_shooter.getDistance()>150 && i==0){
       i=1;
       value = true;
-    }else if(m_shooter.getDistance()<125){
+    }else if(m_shooter.getDistance()<150){
       i=0;
     }
     return value;

@@ -51,6 +51,8 @@ public class AutonAdjust extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_driveTrain.setServo(.85); //Low Value is .
+    table.getEntry("pipeline").setNumber(0);
     double x = tx.getDouble(0.0);
     m_driveTrain.setPower(-x/45, x/45);
     SmartDashboard.putNumber("LimelightX", x);
