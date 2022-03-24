@@ -64,11 +64,12 @@ public class JoystickDrive extends CommandBase {
   @Override
   public void execute() {
     if(controller2.getBButtonPressed()){
-      if(climbToggle){
-        climbToggle= false;
-      }else{
-        climbToggle = true;
-      }
+      // if(climbToggle){
+      //   climbToggle= false;
+      // }else{
+      //   climbToggle = true;
+      // }
+      climbToggle = !climbToggle;
     }
 
     if(!climbToggle){

@@ -24,7 +24,7 @@ public class Shooter extends SubsystemBase {
   private TalonFX rightShooter = new TalonFX(5);
   private VictorSPX intake = new VictorSPX(7);
   private VictorSPX index = new VictorSPX(8);
-  private ColorSensorV3 cdSeneor = new ColorSensorV3(I2C.Port.kOnboard);
+  //private ColorSensorV3 cdSeneor = new ColorSensorV3(I2C.Port.kOnboard);
   
 
   public void setPowerShooter(double power){
@@ -53,9 +53,9 @@ public class Shooter extends SubsystemBase {
     index.setNeutralMode(NeutralMode.Brake);
   }
 
-  public int getDistance(){
-    return cdSeneor.getProximity();
-  }
+  // public int getDistance(){
+  //   return cdSeneor.getProximity();
+  // }
 
   public double getLeftVelocity(){
    return leftShooter.getSelectedSensorVelocity();     

@@ -76,9 +76,10 @@ public class RobotContainer {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(new AutonDriveStraight(driveTrain, 50000), new AutonIntake(shooter, 1)),
         new AutonIntake(shooter, 0),
-        new AutonTurn(driveTrain, 190),
-        new ParallelCommandGroup(new AutonAdjust(driveTrain), new AutonShooter(shooter,15500)),
-        new AutonIndex(shooter, -.5, .25),
+        new AutonTurn(driveTrain, 210),
+        new AutonDriveStraight(driveTrain, 33000),
+        new ParallelCommandGroup(new AutonAdjust(driveTrain), new AutonShooter(shooter,14000)),
+        new AutonIndex(shooter, -.5, .5),
         new AutonIndex(shooter, 0, 1),
         new AutonIndex(shooter, -.5, .5),
         new AutonIndex(shooter, 0, .1),

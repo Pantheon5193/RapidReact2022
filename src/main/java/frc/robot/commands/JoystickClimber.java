@@ -36,94 +36,117 @@ public class JoystickClimber extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-      m_Climber.setNeutralMode();
+      m_Climber.setNeutralMode(); //Turn the climbing motors to brakemode
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(controller2.getBButtonPressed()){
-      if(climbToggle){
-        climbToggle= false;
-      }else{
-        climbToggle = true;
-      }
+    if(controller2.getXButtonPressed()){ //This if statement is useless remove it after competition
+      climbToggle = !climbToggle;
     }
+    SmartDashboard.putBoolean("Cimber's Toggle ", climbToggle);
     
-    if(climbToggle){
-      if(!m_Climber.touch(2)){
-        m_Climber.resetEncoder(2);
+
+      if(!m_Climber.touch(2)){ //If any touchsensor is pressed, reset the motor encoders
+        m_Climber.resetEncoder(2);  //2 is RightWinch
       }
-      if(!m_Climber.touch(3)){
+      if(!m_Climber.touch(3)){     //3 is LeftWinch
         m_Climber.resetEncoder(3);
       }
-      if(!m_Climber.touch(0)){
+      if(!m_Climber.touch(0)){    //0 is Right Reacher
         m_Climber.resetEncoder(0);
       }
-      if(!m_Climber.touch(1)){
+      if(!m_Climber.touch(1)){    //1 is Left Reacher
         m_Climber.resetEncoder(1);
       }
-      if (Math.abs(controller.getRightY()) > .2) {
-        if(!m_Climber.touch(2)){
-          m_Climber.setPowerRightWinch(Math.min(controller.getRightY(), 0));
-        }else if(m_Climber.getRightWinchEncoder()<-200000){
-          m_Climber.setPowerRightWinch(Math.max(controller.getRightY(), 0));
-        }else{
-          m_Climber.setPowerRightWinch(controller.getRightY());
-        }
-      } else {
-          m_Climber.setPowerRightWinch(0);
-      }
+      
 
-      if (Math.abs(controller.getLeftY()) > .2) {
+        if (Math.abs(controller2.getRightY()) > .2) { //Control Right Winch with right stick
+          if(!m_Climber.touch(2)){ //Don't let the motor go past the touch sensor
+            m_Climber.setPowerRightWinch(Math.min(controller2.getRightY(), 0));
+          }else if(m_Climber.getRightWinchEncoder()<-200000){//Set the high limit to the winch
+            m_Climber.setPowerRightWinch(Math.max(controller2.getRightY(), 0));
+          }else{//Normal control if above conditions are not met
+            m_Climber.setPowerRightWinch(controller2.getRightY());
+          }
+        } else {
+            m_Climber.setPowerRightWinch(0);
+        }
+// at this point we are going to build tetris in the smart dashboard for gabriel to play when he gets bored-L;
+      if (Math.abs(controller2.getLeftY()) > .2) {
         if(!m_Climber.touch(3)){
-          m_Climber.setPowerLeftWinch(Math.min(controller.getLeftY(), 0));
-        }else if(m_Climber.getLeftWinchEncoder()<-245000){
-          m_Climber.setPowerLeftWinch(Math.max(controller.getLeftY(), 0));
+          m_Climber.setPowerLeftWinch(Math.max(-controller2.getLeftY(), 0));
+        }else if(m_Climber.getLeftWinchEncoder()>228000){
+          m_Climber.setPowerLeftWinch(Math.min(-controller2.getLeftY(), 0));
         }else{
-          m_Climber.setPowerLeftWinch(controller.getLeftY());
+          m_Climber.setPowerLeftWinch(-controller2.getLeftY());
         }
       } else {
           m_Climber.setPowerLeftWinch(0);
       }
-      
-      if (Math.abs(controller2.getLeftY()) > .2) {
-        if(!m_Climber.touch(1)){
-          m_Climber.setLeftReacher(Math.min(controller2.getLeftY(), 0));
-        }else if(m_Climber.getLeftReacherEncoder()<-5){
-          m_Climber.setLeftReacher(Math.max(controller2.getLeftY(), 0));
+
+      if (Math.abs(controller2.getRightTriggerAxis()) > .2) {
+        if(m_Climber.getRightReacherEncoder()>1.25){//Was 4.5
+          m_Climber.setRightReacher(0);
         }else{
-          m_Climber.setLeftReacher(controller2.getLeftY());
+          m_Climber.setRightReacher(controller2.getRightTriggerAxis()/4);
         }
-      } else {
-          m_Climber.setLeftReacher(0);
+      }else if(Math.abs(controller2.getLeftTriggerAxis()) > .2){
+        if(!m_Climber.touch(0)){
+          m_Climber.setRightReacher(0);
+        }else{
+          m_Climber.setRightReacher(-controller2.getLeftTriggerAxis()/4);
+        }
+      }else{
+        m_Climber.setRightReacher(0);
       }
 
-      if (Math.abs(controller2.getRightY()) > .2) {
-        if(!m_Climber.touch(0)){
-          m_Climber.setRightReacher(Math.max(controller2.getRightY(), 0));
-        }else if(m_Climber.getRightReacherEncoder()>8.5){
-          m_Climber.setRightReacher(Math.min(controller2.getRightY(), 0));
+      if (controller2.getRightBumper()) {
+        if(m_Climber.getLeftReacherEncoder()<-1.25){
+          m_Climber.setLeftReacher(0);
         }else{
-          m_Climber.setRightReacher(controller2.getRightY());
+          m_Climber.setLeftReacher(1);
         }
-      } else {
-          m_Climber.setRightReacher(0);
+      }else if(controller2.getLeftBumper()){
+        if(!m_Climber.touch(1)){
+          m_Climber.setLeftReacher(0);
+        }else{
+          m_Climber.setLeftReacher(-1);
+        }
+      }else{
+        m_Climber.setLeftReacher(0);
       }
+
+      
+      
+      // if (Math.abs(controller2.getLeftY()) > .2) {
+      //   if(!m_Climber.touch(1)){
+      //     m_Climber.setLeftReacher(Math.min(controller2.getLeftY(), 0));
+      //   }else if(m_Climber.getLeftReacherEncoder()<-5){
+      //     m_Climber.setLeftReacher(Math.max(controller2.getLeftY(), 0));
+      //   }else{
+      //     m_Climber.setLeftReacher(controller2.getLeftY());
+      //   }
+      // } else {
+      //     m_Climber.setLeftReacher(0);
+      // }
+
+      
 
     SmartDashboard.putBoolean("Touch BR", m_Climber.touch(0));
     SmartDashboard.putBoolean("Touch BL", m_Climber.touch(1));
     SmartDashboard.putBoolean("Touch TR", m_Climber.touch(2));
     SmartDashboard.putBoolean("Touch TL", m_Climber.touch(3));
     SmartDashboard.putNumber("Right Stick", controller2.getRightY());
-    SmartDashboard.putNumber("LeftW Encoder: ", m_Climber.getLeftWinchEncoder());
-    SmartDashboard.putNumber("RightW Encoder: ", m_Climber.getRightWinchEncoder());
-    SmartDashboard.putNumber("LeftR Encoder: ", m_Climber.getLeftReacherEncoder());
-    SmartDashboard.putNumber("RightR Encoder: ", m_Climber.getRightReacherEncoder());
+    SmartDashboard.putNumber("Left winch Encoder: ", m_Climber.getLeftWinchEncoder());
+    SmartDashboard.putNumber("Right winch Encoder: ", m_Climber.getRightWinchEncoder());
+    SmartDashboard.putNumber("Left reacher Encoder: ", m_Climber.getLeftReacherEncoder());
+    SmartDashboard.putNumber("Right reacher Encoder: ", m_Climber.getRightReacherEncoder());
     }
     
     
-  }
+  
 
   // Called once the command ends or is interrupted.
   @Override
