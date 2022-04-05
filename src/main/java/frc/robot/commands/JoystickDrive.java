@@ -115,6 +115,18 @@ public class JoystickDrive extends CommandBase {
         m_driveTrain.setServo(.575);
         table.getEntry("pipeline").setNumber(1);
       }
+
+      if(controller.getXButton()){
+        if(area!=0){
+          m_driveTrain.setPower(-x/ 75, x/75);
+        }
+        if(leftP.getAsDouble()<-.2){
+          averagePow = Math.pow((leftP.getAsDouble()), 3);
+          m_driveTrain.setPower(averagePow + ((-x) / 75),
+            (averagePow + ((x) / 75)));
+        }
+
+      }
   
       
       angleToGoalDeg = 35 +y;

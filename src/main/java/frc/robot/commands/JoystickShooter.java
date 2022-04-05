@@ -8,6 +8,8 @@ package frc.robot.commands;
 // import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
 
+import java.util.function.DoubleSupplier;
+
 // import com.fasterxml.jackson.annotation.JacksonInject.Value;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -38,6 +40,9 @@ public class JoystickShooter extends CommandBase {
   private double distanceToGoal =0;
   private double y = table.getEntry("ty").getDouble(0);
   private float ratio = (float) 1;
+  private DoubleSupplier leftP;
+  private boolean autoIntake = false;
+  private int autoBallCount;
 
   /**
    * Creates a new ExampleCommand.
@@ -48,6 +53,7 @@ public class JoystickShooter extends CommandBase {
     m_shooter = subsystem;
     controller = gamepad;
     controller2 = gamepad2;
+    leftP = ()->controller.getLeftY();
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
@@ -77,6 +83,11 @@ public class JoystickShooter extends CommandBase {
       timeoutTimer.reset();
     }
 
+    if(sensorUpdate()){
+      autoIntake = false;
+    }
+
+
     
     //130 to 118 -16500
     //118-103 - 15000
@@ -85,8 +96,13 @@ public class JoystickShooter extends CommandBase {
     //83-73 12500
     //73-63 12000
     //63-54   11500
+    if(controller.getXButtonPressed()){
+      autoIntake = true;
+    }
 
-    if(controller.getRightTriggerAxis()>.1){
+    if(autoIntake){
+      m_shooter.setPowerIntake(() -> 1);
+    }else if(controller.getRightTriggerAxis()>.1){
       m_shooter.setPowerIntake(() -> controller.getRightTriggerAxis());
     }else if(controller.getBButton()){
       m_shooter.setPowerIntake(() -> -.5);
@@ -130,12 +146,14 @@ public class JoystickShooter extends CommandBase {
       m_shooter.setPowerIndex(() ->-.5);
     }else if(timer.get()>0){
       if(ballCount==1 && m_shooter.getIndexTouchSensor()){
-        m_shooter.setPowerIndex(() ->-.5);
+        m_shooter.setPowerIndex(() ->-1);
       }else if(ballCount==2 && timer.get()<.1){
         m_shooter.setPowerIndex(() ->-.5);
       }else{
         m_shooter.setPowerIndex(() -> 0);
       }
+    }else{
+      m_shooter.setPowerIndex(() -> 0);
     }
     // }else if (controller.getLeftBumper()){
     //   m_shooter.setPowerIndex(() -> 1);
@@ -185,6 +203,8 @@ public class JoystickShooter extends CommandBase {
     SmartDashboard.putNumber("Velocity", velocity);
     SmartDashboard.putBoolean("Shooter Ready", shooterReady);
     SmartDashboard.putBoolean("Index Touch Sensor", m_shooter.getIndexTouchSensor());
+    SmartDashboard.putBoolean("Auto Intake", autoIntake);
+    SmartDashboard.putNumber("Auto Ball Count", autoBallCount);
     }
   }
 
