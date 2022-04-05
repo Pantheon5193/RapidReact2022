@@ -8,6 +8,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.SPI.Port;
@@ -42,6 +44,24 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
   public double getAngle(){
     return gyro.getAngle();
+  }
+
+  public void setCurrentLimit(){
+    //fl.configOpenloopRamp(.2);
+    //fr.configOpenloopRamp(.2);
+    //bl.configOpenloopRamp(.2);
+    //br.configOpenloopRamp(.2);
+    fl.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 45,50,1));
+    fr.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 45,50,1));
+    bl.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 45,50,1));
+    br.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 45,50,1));
+  }
+
+  public void setCurrentLimitZero(){
+    fl.configOpenloopRamp(0);
+    fr.configOpenloopRamp(0);
+    bl.configOpenloopRamp(0);
+    br.configOpenloopRamp(0);
   }
 
   public double getEncoderCount(){

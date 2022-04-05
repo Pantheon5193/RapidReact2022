@@ -5,9 +5,9 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Shooter;
+// import frc.robot.subsystems.DriveTrain;
+// import frc.robot.subsystems.ExampleSubsystem;
+// import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -65,7 +65,7 @@ public class JoystickClimber extends CommandBase {
         if (Math.abs(controller2.getRightY()) > .2) { //Control Right Winch with right stick
           if(!m_Climber.touch(2)){ //Don't let the motor go past the touch sensor
             m_Climber.setPowerRightWinch(Math.min(controller2.getRightY(), 0));
-          }else if(m_Climber.getRightWinchEncoder()<-200000){//Set the high limit to the winch
+          }else if(m_Climber.getRightWinchEncoder()<-236000){//Set the high limit to the winch
             m_Climber.setPowerRightWinch(Math.max(controller2.getRightY(), 0));
           }else{//Normal control if above conditions are not met
             m_Climber.setPowerRightWinch(controller2.getRightY());
@@ -106,7 +106,7 @@ public class JoystickClimber extends CommandBase {
         if(m_Climber.getLeftReacherEncoder()<-1.25){
           m_Climber.setLeftReacher(0);
         }else{
-          m_Climber.setLeftReacher(1);
+          m_Climber.setLeftReacher(.75);
         }
       }else if(controller2.getLeftBumper()){
         if(!m_Climber.touch(1)){

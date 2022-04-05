@@ -11,10 +11,11 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.revrobotics.ColorSensorV3;
+
+// import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.I2C;
+// import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
@@ -24,8 +25,7 @@ public class Shooter extends SubsystemBase {
   private TalonFX rightShooter = new TalonFX(5);
   private VictorSPX intake = new VictorSPX(7);
   private VictorSPX index = new VictorSPX(8);
-  //private ColorSensorV3 cdSeneor = new ColorSensorV3(I2C.Port.kOnboard);
-  
+  private DigitalInput indexTouchSensor = new DigitalInput(4); 
 
   public void setPowerShooter(double power){
     leftShooter.set(ControlMode.Velocity, power);
@@ -50,12 +50,13 @@ public class Shooter extends SubsystemBase {
   
   public void setPowerIndex(DoubleSupplier power){
     index.set(ControlMode.PercentOutput, power.getAsDouble());
-    index.setNeutralMode(NeutralMode.Brake);
+    index.setNeutralMode(NeutralMode.Coast);
   }
 
-  // public int getDistance(){
-  //   return cdSeneor.getProximity();
-  // }
+  public boolean getIndexTouchSensor(){
+    return indexTouchSensor.get();
+  }
+
 
   public double getLeftVelocity(){
    return leftShooter.getSelectedSensorVelocity();     

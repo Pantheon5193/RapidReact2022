@@ -4,9 +4,9 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
+// import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+// import edu.wpi.first.networktables.NetworkTable;
+// import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.ExampleCommand;
@@ -40,7 +40,7 @@ public class RobotContainer {
   private final XboxController controller = new XboxController(0);
   private final XboxController controller2 = new XboxController(1);
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+  // private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   private final DriveTrain driveTrain = new DriveTrain();
   private final Shooter shooter = new Shooter();
   private final Climber climber = new Climber();
@@ -76,12 +76,12 @@ public class RobotContainer {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(new AutonDriveStraight(driveTrain, 50000), new AutonIntake(shooter, 1)),
         new AutonIntake(shooter, 0),
-        new AutonTurn(driveTrain, 210),
-        new AutonDriveStraight(driveTrain, 33000),
+        new AutonTurn(driveTrain, 200),
+        //new AutonDriveStraight(driveTrain, 33000),
         new ParallelCommandGroup(new AutonAdjust(driveTrain), new AutonShooter(shooter,14000)),
         new AutonIndex(shooter, -.5, .5),
         new AutonIndex(shooter, 0, 1),
-        new AutonIndex(shooter, -.5, .5),
+        new AutonIndex(shooter, -.5, 1),
         new AutonIndex(shooter, 0, .1),
         new AutonShooterStop(shooter)
         );

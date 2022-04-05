@@ -5,7 +5,7 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.ExampleSubsystem;
+// import frc.robot.subsystems.ExampleSubsystem;
 
 import java.util.function.DoubleSupplier;
 
@@ -56,6 +56,7 @@ public class JoystickDrive extends CommandBase {
     m_driveTrain.resetGyro();
     m_driveTrain.coastMode();
     m_driveTrain.resetEncoder();
+    m_driveTrain.setCurrentLimit();
     // m_driveTrain.resetEncoder(); Do this eventually please
     //I hate science fair
   }
@@ -64,12 +65,10 @@ public class JoystickDrive extends CommandBase {
   @Override
   public void execute() {
     if(controller2.getBButtonPressed()){
-      // if(climbToggle){
-      //   climbToggle= false;
-      // }else{
-      //   climbToggle = true;
-      // }
-      climbToggle = !climbToggle;
+      m_driveTrain.setCurrentLimit();
+    }
+    if(controller2.getAButtonPressed()){
+      m_driveTrain.setCurrentLimitZero();
     }
 
     if(!climbToggle){

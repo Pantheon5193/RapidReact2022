@@ -4,16 +4,16 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.ExampleSubsystem;
+// import frc.robot.subsystems.DriveTrain;
+// import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
 
-import com.fasterxml.jackson.annotation.JacksonInject.Value;
+// import com.fasterxml.jackson.annotation.JacksonInject.Value;
 
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
+// import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.TimedRobot;
+// import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,7 +37,7 @@ public class JoystickShooter extends CommandBase {
   private int i;
   private double distanceToGoal =0;
   private double y = table.getEntry("ty").getDouble(0);
-  private float ratio = (float) 1.2;
+  private float ratio = (float) 1;
 
   /**
    * Creates a new ExampleCommand.
@@ -62,14 +62,6 @@ public class JoystickShooter extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(controller2.getAButtonPressed()){
-      // if(climbToggle){
-      //   climbToggle= false;
-      // }else{
-      //   climbToggle = true;
-      // }
-      climbToggle = !climbToggle;
-    }
     SmartDashboard.putBoolean("Climb mode", climbToggle);
 
     if(!climbToggle){
@@ -122,32 +114,34 @@ public class JoystickShooter extends CommandBase {
     //   m_shooter.setPowerIntake(() -> 0);
     // }
 
-    // if(sensorUpdate()){
-    //   timer.start();
-    //   ballCount++;
-    // }
+    if(sensorUpdate()){
+      timer.start();
+      ballCount++;
+    }
+
     if(timer.get()>2){
       timer.stop();
       timer.reset();
     }
     if(controller.getRightBumper()){
-      m_shooter.setPowerIndex(() -> -.3);
-      
-    // }else if(timeoutTimer.get()<.2 && timeoutTimer.get()>0){
-    //   m_shooter.setPowerIndex(() ->-.5);
-    // }else if(timer.get()>0){
-    //   if(ballCount==1){//m_shooter.getDistance()>150){
-    //     m_shooter.setPowerIndex(() ->-.3);
-    //   }else if(ballCount==2 && timer.get()<.1){
-    //     m_shooter.setPowerIndex(() ->-.3);
-    //   }else{
-    //     m_shooter.setPowerIndex(() -> 0);
-    //   }
-    }else if (controller.getLeftBumper()){
-      m_shooter.setPowerIndex(() -> .3);
-    }else {
-      m_shooter.setPowerIndex(() -> 0);
+     //m_shooter.setPowerIndex(() -> -1);
+     timeoutTimer.start(); 
+    }else if(timeoutTimer.get()<.2 && timeoutTimer.get()>0){
+      m_shooter.setPowerIndex(() ->-.5);
+    }else if(timer.get()>0){
+      if(ballCount==1 && m_shooter.getIndexTouchSensor()){
+        m_shooter.setPowerIndex(() ->-.5);
+      }else if(ballCount==2 && timer.get()<.1){
+        m_shooter.setPowerIndex(() ->-.5);
+      }else{
+        m_shooter.setPowerIndex(() -> 0);
+      }
     }
+    // }else if (controller.getLeftBumper()){
+    //   m_shooter.setPowerIndex(() -> 1);
+    // }else {
+    //   m_shooter.setPowerIndex(() -> 0);
+    // }
 
     if(Math.abs(m_shooter.getLeftVelocity() - velocity) <600){
       shooterReady = true;
@@ -190,6 +184,7 @@ public class JoystickShooter extends CommandBase {
     SmartDashboard.putNumber("Right Power", m_shooter.getRightVelocity());
     SmartDashboard.putNumber("Velocity", velocity);
     SmartDashboard.putBoolean("Shooter Ready", shooterReady);
+    SmartDashboard.putBoolean("Index Touch Sensor", m_shooter.getIndexTouchSensor());
     }
   }
 
@@ -203,14 +198,14 @@ public class JoystickShooter extends CommandBase {
     return false;
   }
 
-  // public boolean sensorUpdate(){
-  //   boolean value = false;
-  //   if(m_shooter.getDistance()>150 && i==0){
-  //     i=1;
-  //     value = true;
-  //   }else if(m_shooter.getDistance()<150){
-  //     i=0;
-  //   }
-  //   return value;
-  // }
+  public boolean sensorUpdate(){
+    boolean value = false;
+    if(m_shooter.getIndexTouchSensor() && i==0){
+      i=1;
+      value = true;
+    }else if(!m_shooter.getIndexTouchSensor()){
+      i=0;
+    }
+    return value;
+  }
 }
